@@ -11,6 +11,25 @@ import torch.nn as nn
 from torchvision import models, transforms
 
 
+def load_env_file(path):
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+service_dir = Path(__file__).resolve().parent
+load_env_file(service_dir.parent / ".env")
+load_env_file(service_dir / ".env")
+
+
 CLASSES_ESPECES = [
     "Apple", "Blueberry", "Cherry", "Corn", "Grape",
     "Orange", "Peach", "Pepper", "Potato", "Raspberry",
@@ -18,7 +37,7 @@ CLASSES_ESPECES = [
 ]
 
 CLASSES_MALADIES = {
-    "Apple": ["Apple__Apple_scab", "Apple___Black_rot", "Apple___Cedar_apple_rust", "Apple___healthy"],
+    "Apple": ["Apple__Alternaria_leaf_spot", "Apple___Apple_scab", "Apple___Black_rot", "Apple__Brown_spot", "Apple___Cedar_apple_rust", "Apple__Frogeye_leaf_spot", "Apple__Gey_spot", "Apple___healthy", "Apple__Mosaic", "Apple__Powdery_mildew"],
     "Blueberry": ["Blueberry___healthy"],
     "Cherry": ["Cherry___Powdery_mildew", "Cherry___healthy"],
     "Corn": ["Corn___Cercospora_leaf_spot Gray_leaf_spot", "Corn___Common_rust_", "Corn___Northern_Leaf_Blight", "Corn___healthy"],
