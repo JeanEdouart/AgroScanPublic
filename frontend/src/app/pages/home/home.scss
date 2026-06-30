@@ -1,0 +1,426 @@
+:host {
+  --local-scroll: var(--scroll, 0);
+  --hero-local: var(--hero-scroll, 0);
+  --flow-local: var(--flow-scroll, 0);
+  --terrain-local: var(--terrain-scroll, 0);
+  display: block;
+  overflow: clip;
+  background: var(--sand);
+}
+
+.hero,
+.flow,
+.terrain {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero {
+  display: grid;
+  min-height: calc(100vh - 5.25rem);
+  grid-template-columns: minmax(0, 1.05fr) minmax(18rem, 0.95fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 6rem);
+  padding: clamp(4rem, 8vw, 7rem) 7vw;
+  background:
+    radial-gradient(circle at 18% calc(12% + var(--hero-local) * 58%), rgba(192, 142, 58, 0.25), transparent 18rem),
+    linear-gradient(135deg, var(--sand), var(--oat));
+}
+
+.scroll-progress {
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.scroll-progress {
+  position: fixed;
+  z-index: 25;
+  top: 5.25rem;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: rgba(96, 108, 56, 0.14);
+}
+
+.scroll-progress span {
+  display: block;
+  width: calc(var(--local-scroll) * 100%);
+  height: 100%;
+  border-radius: 0 999px 999px 0;
+  background: var(--terracotta);
+}
+
+.hero-copy {
+  max-width: 46rem;
+  opacity: calc(1.12 - var(--hero-local) * 0.8);
+  transform: translateY(calc(var(--hero-local) * -6rem));
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--terracotta);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+}
+
+h1 {
+  max-width: 11ch;
+  font-size: clamp(3.6rem, 9vw, 8.4rem);
+  line-height: 0.9;
+  transform: translateX(calc(var(--hero-local) * -1.4rem));
+}
+
+.intro {
+  max-width: 40rem;
+  margin: 2rem 0;
+  color: var(--moss);
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  line-height: 1.7;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.primary,
+.secondary,
+.terrain a {
+  display: inline-flex;
+  min-height: 3.25rem;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.95rem 1.3rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.primary,
+.terrain a {
+  background: var(--moss-dark);
+  color: var(--sand);
+}
+
+.secondary {
+  color: var(--moss-dark);
+  box-shadow: inset 0 0 0 1px var(--sage);
+}
+
+.field-stage {
+  position: relative;
+  min-height: clamp(27rem, 48vw, 39rem);
+  transform: translateY(calc(var(--hero-local) * -8rem));
+}
+
+.orbit,
+.field-card {
+  position: absolute;
+  border-radius: 32px;
+}
+
+.orbit {
+  inset: 8% 7% auto auto;
+  width: 66%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(96, 108, 56, 0.24);
+  transform: rotate(calc(var(--hero-local) * 240deg)) scale(calc(0.86 + var(--hero-local) * 0.22));
+}
+
+.orbit-two {
+  inset: auto auto 4% 3%;
+  width: 52%;
+  background: rgba(139, 157, 131, 0.22);
+}
+
+.field-card {
+  overflow: hidden;
+  padding: 1.2rem;
+  background: var(--oat);
+  box-shadow: 1.2rem 1.2rem 0 rgba(139, 157, 131, 0.7);
+}
+
+.growth-path {
+  position: absolute;
+  right: 18%;
+  bottom: 8%;
+  width: 2px;
+  height: calc(18% + var(--hero-local) * 62%);
+  border-radius: 999px;
+  background: var(--terracotta);
+  transform: rotate(-19deg);
+  transform-origin: bottom;
+}
+
+.field-card-main {
+  inset: 7% 10% auto auto;
+  width: min(86%, 27rem);
+  height: min(72%, 31rem);
+  background:
+    radial-gradient(circle at 20% 88%, var(--sage) 0 17%, transparent 17.5%),
+    radial-gradient(circle at 82% 20%, var(--ochre) 0 13%, transparent 13.5%),
+    var(--moss);
+  color: var(--sand);
+  transform:
+    translateY(calc(var(--hero-local) * -4rem))
+    rotate(calc(8deg - var(--hero-local) * 20deg));
+}
+
+.field-card-main strong {
+  position: absolute;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  left: 1.2rem;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+}
+
+.field-card-note {
+  right: 1%;
+  bottom: 7%;
+  width: min(62%, 18rem);
+  color: var(--moss-dark);
+  font-weight: 800;
+  transform: rotate(calc(-12deg + var(--hero-local) * 10deg)) translateY(calc(var(--hero-local) * -7rem));
+}
+
+.leaf {
+  position: absolute;
+  width: 11rem;
+  height: 17rem;
+  border-radius: 90% 10% 90% 10%;
+  background: var(--sage);
+}
+
+.leaf-one {
+  bottom: -2rem;
+  left: 10%;
+  transform: rotate(calc(-35deg + var(--hero-local) * 26deg)) translateY(calc(var(--hero-local) * -2rem));
+}
+
+.leaf-two {
+  top: 1rem;
+  right: 8%;
+  background: var(--ochre);
+  transform: rotate(calc(35deg - var(--hero-local) * 28deg)) scale(calc(0.68 + var(--hero-local) * 0.22));
+}
+
+.scan-line {
+  position: absolute;
+  top: calc(8% + var(--hero-local) * 78%);
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: var(--sand);
+  box-shadow: 0 0 1rem var(--sand);
+}
+
+.flow {
+  display: grid;
+  grid-template-columns: minmax(15rem, 0.75fr) minmax(0, 1.25fr);
+  gap: 5vw;
+  padding: 7rem 7vw;
+  background: var(--moss-dark);
+  color: var(--sand);
+}
+
+.flow-heading {
+  position: sticky;
+  top: 7rem;
+  align-self: start;
+  transform: translateY(calc(var(--flow-local) * 2rem));
+}
+
+.flow h2,
+.terrain h2 {
+  max-width: 13ch;
+  font-size: clamp(2.5rem, 5vw, 5.5rem);
+  line-height: 0.96;
+}
+
+.flow-track {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.flow li {
+  min-height: 16rem;
+  border-radius: 28px;
+  padding: clamp(1.3rem, 3vw, 2rem);
+  background: color-mix(in srgb, var(--moss) 86%, var(--sage));
+  transform:
+    translateX(calc((var(--flow-local) - 0.25) * 8rem))
+    translateY(calc((0.4 - var(--flow-local)) * 3rem))
+    rotate(calc((var(--flow-local) - 0.3) * -2deg));
+}
+
+.flow li:nth-child(2) {
+  background: var(--sage);
+  color: var(--moss-dark);
+  transform:
+    translateX(calc((0.52 - var(--flow-local)) * 8rem))
+    translateY(calc((var(--flow-local) - 0.45) * 3rem))
+    rotate(calc((var(--flow-local) - 0.5) * 2deg));
+}
+
+.flow li:nth-child(3) {
+  background: var(--terracotta);
+  transform:
+    translateX(calc((var(--flow-local) - 0.75) * 8rem))
+    translateY(calc((0.75 - var(--flow-local)) * 3rem))
+    rotate(calc((var(--flow-local) - 0.7) * -2deg));
+}
+
+.flow li span {
+  color: var(--oat);
+  font-weight: 800;
+}
+
+.flow li:nth-child(2) span {
+  color: var(--moss);
+}
+
+.flow strong {
+  display: block;
+  margin-top: 3.4rem;
+  font-size: 1.5rem;
+}
+
+.flow p,
+.terrain p {
+  line-height: 1.65;
+}
+
+.terrain {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(18rem, 1.05fr);
+  align-items: center;
+  gap: 4vw;
+  margin: 6vw;
+  padding: clamp(2rem, 6vw, 6rem);
+  border-radius: 32px;
+  background: var(--terracotta);
+  color: var(--sand);
+  transform: translateY(calc((1 - var(--terrain-local)) * 4rem)) scale(calc(0.96 + var(--terrain-local) * 0.04));
+}
+
+.terrain .eyebrow {
+  color: var(--sand);
+}
+
+.terrain-copy {
+  position: relative;
+  z-index: 1;
+  transform: translateX(calc((0.5 - var(--terrain-local)) * 4rem));
+}
+
+.terrain p:not(.eyebrow) {
+  max-width: 42rem;
+  margin: 2rem 0;
+}
+
+.terrain-visual {
+  position: relative;
+  min-height: clamp(18rem, 36vw, 31rem);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(232, 220, 199, 0.18), transparent 30%),
+    var(--moss);
+  overflow: hidden;
+  transform: rotate(calc((var(--terrain-local) - 0.45) * 6deg));
+}
+
+.terrain-visual span {
+  position: absolute;
+  width: 42%;
+  height: 78%;
+  border-radius: 90% 10% 90% 10%;
+  background: var(--sage);
+  transform-origin: bottom center;
+}
+
+.terrain-visual span:nth-child(1) {
+  bottom: -18%;
+  left: 9%;
+  transform: rotate(calc(-36deg + var(--terrain-local) * 26deg)) translateY(calc(var(--terrain-local) * -3rem));
+}
+
+.terrain-visual span:nth-child(2) {
+  bottom: -10%;
+  left: 35%;
+  background: var(--oat);
+  transform: translateY(calc(var(--terrain-local) * -4rem)) scale(calc(0.8 + var(--terrain-local) * 0.25));
+}
+
+.terrain-visual span:nth-child(3) {
+  right: 8%;
+  bottom: -16%;
+  background: var(--ochre);
+  transform: rotate(calc(34deg - var(--terrain-local) * 22deg)) translateY(calc(var(--terrain-local) * -2.4rem));
+}
+
+@media (max-width: 900px) {
+  .hero,
+  .flow,
+  .terrain {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 4rem 5vw 5rem;
+  }
+
+  .field-stage {
+    min-height: 31rem;
+  }
+
+  .flow {
+    padding: 5rem 5vw;
+  }
+
+  .flow-heading {
+    position: static;
+  }
+
+  .terrain {
+    margin: 5vw;
+  }
+}
+
+@media (max-width: 560px) {
+  h1 {
+    font-size: clamp(3rem, 18vw, 4.5rem);
+  }
+
+  .field-card-main {
+    width: 92%;
+  }
+
+  .field-card-note {
+    width: 78%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field-stage,
+  .orbit,
+  .growth-path,
+  .field-card-main,
+  .field-card-note,
+  .flow li,
+  .terrain,
+  .terrain-visual span {
+    transform: none;
+    transition: none;
+  }
+}

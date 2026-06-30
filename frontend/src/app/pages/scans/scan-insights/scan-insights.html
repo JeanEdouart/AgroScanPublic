@@ -1,0 +1,55 @@
+@let insight = insights();
+
+<section class="insights-panel" aria-label="Synthese des scans">
+  <div class="insight-card">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5" /></svg>
+    <span>Total actif</span>
+    <strong>{{ insight.total }}</strong>
+  </div>
+  <div class="insight-card attention" [class.calm]="insight.attention === 0">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.5 20h19zM12 9v4m0 4h.01" /></svg>
+    <span>A surveiller</span>
+    <strong>{{ insight.attention }}</strong>
+  </div>
+  <div class="insight-card">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6" /></svg>
+    <span>Analyses terminees</span>
+    <strong>{{ insight.analyzed }}</strong>
+  </div>
+  <div class="insight-card healthy">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c9 0 14-5 14-14C10 5 5 10 5 19Zm0 0 7-7" /></svg>
+    <span>Plantes saines</span>
+    <strong>{{ insight.healthy }}</strong>
+  </div>
+
+  <div class="insight-list plot-health">
+    <div class="insight-heading">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16M8 4v16M16 4v16" /></svg>
+      <h2>Parcelles recentes</h2>
+    </div>
+    @for (plot of insight.plots; track plot.plotName) {
+      <button type="button" (click)="plotSelected.emit(plot.plotName)" [disabled]="plot.plotName === 'Sans parcelle'">
+        <span>{{ plot.plotName }}</span>
+        <small>{{ plot.total }} scans · {{ plot.diseased }} alertes</small>
+        <i><b [style.width.%]="insightRatio(plot.healthy, plot.total)"></b></i>
+      </button>
+    } @empty {
+      <p>Aucune parcelle suivie pour le moment.</p>
+    }
+  </div>
+
+  <div class="insight-list disease-watch">
+    <div class="insight-heading">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8c4 0 7 3 7 7v3H5v-3c0-4 3-7 7-7Zm0 0V4m-4 8-3-2m11 2 3-2" /></svg>
+      <h2>Maladies frequentes</h2>
+    </div>
+    @for (disease of insight.diseases; track disease.disease) {
+      <button type="button" (click)="diseaseSelected.emit(disease.diseaseLabel)">
+        <span>{{ disease.diseaseLabel }}</span>
+        <small>{{ disease.occurrences }} detections</small>
+      </button>
+    } @empty {
+      <p>Aucune maladie detectee sur les scans actifs.</p>
+    }
+  </div>
+</section>

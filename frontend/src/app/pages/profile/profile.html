@@ -1,0 +1,80 @@
+<section class="profile-page">
+  <header>
+    <div class="avatar" aria-hidden="true">
+      @if (user()?.profilePhotoDataUrl) {
+        <img [src]="user()!.profilePhotoDataUrl!" alt="" />
+      } @else {
+        <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0" /></svg>
+      }
+    </div>
+    <div><p>Mon compte</p><h1>Mon profil</h1></div>
+  </header>
+
+  <div class="profile-grid">
+    <article>
+      <div class="card-heading photo-heading">
+        <span>Photo de profil</span>
+        <h2>Votre avatar</h2>
+        <p>Elle remplace l'icône du compte dans l'en-tête quand elle est renseignée.</p>
+      </div>
+      <div class="photo-editor">
+        <div class="photo-preview" aria-hidden="true">
+          @if (user()?.profilePhotoDataUrl) {
+            <img [src]="user()!.profilePhotoDataUrl!" alt="" />
+          } @else {
+            <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0" /></svg>
+          }
+        </div>
+        <div class="photo-actions">
+          <label class="file-button">
+            <input type="file" accept="image/jpeg,image/png,image/webp" (change)="selectProfilePhoto($event)" [disabled]="photoLoading()" />
+            {{ photoLoading() ? 'Traitement...' : 'Choisir une photo' }}
+          </label>
+          @if (user()?.profilePhotoDataUrl) {
+            <button class="secondary-button" type="button" (click)="removeProfilePhoto()" [disabled]="photoLoading()">Supprimer</button>
+          }
+        </div>
+      </div>
+      @if (photoMessage()) { <p class="feedback success" role="status">{{ photoMessage() }}</p> }
+      @if (photoError()) { <p class="feedback error" role="alert">{{ photoError() }}</p> }
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <span>Informations personnelles</span>
+        <h2>Votre identité</h2>
+        <p>Ces informations apparaissent dans votre espace AgroScan.</p>
+      </div>
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <div class="two-columns">
+          <label>Prénom<input type="text" formControlName="firstName" autocomplete="given-name" /></label>
+          <label>Nom<input type="text" formControlName="lastName" autocomplete="family-name" /></label>
+        </div>
+        <label>Adresse e-mail<input type="email" formControlName="email" autocomplete="email" /></label>
+        <button type="submit" [disabled]="profileLoading() || !profileForm.dirty">
+          {{ profileLoading() ? 'Enregistrement…' : 'Enregistrer les modifications' }}
+        </button>
+      </form>
+      @if (profileMessage()) { <p class="feedback success" role="status">{{ profileMessage() }}</p> }
+      @if (profileError()) { <p class="feedback error" role="alert">{{ profileError() }}</p> }
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <span>Sécurité</span>
+        <h2>Mot de passe</h2>
+        <p>La modification du mot de passe déconnecte toutes vos sessions.</p>
+      </div>
+      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+        <label>Mot de passe actuel<input type="password" formControlName="currentPassword" autocomplete="current-password" /></label>
+        <label>Nouveau mot de passe<input type="password" formControlName="newPassword" autocomplete="new-password" /><small>8 caractères minimum</small></label>
+        <label>Confirmer le nouveau mot de passe<input type="password" formControlName="confirmation" autocomplete="new-password" /></label>
+        <button type="submit" [disabled]="passwordLoading()">
+          {{ passwordLoading() ? 'Modification…' : 'Modifier le mot de passe' }}
+        </button>
+      </form>
+      @if (passwordMessage()) { <p class="feedback success" role="status">{{ passwordMessage() }}</p> }
+      @if (passwordError()) { <p class="feedback error" role="alert">{{ passwordError() }}</p> }
+    </article>
+  </div>
+</section>

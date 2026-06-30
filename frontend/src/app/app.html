@@ -1,0 +1,53 @@
+<header class="site-header">
+  <a class="brand" routerLink="/" (click)="closeMenu()" aria-label="AgroScan, accueil">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span>AgroScan</span>
+  </a>
+
+  <div class="mobile-header-actions">
+    @if (auth.user()) {
+      <app-notification-center class="mobile-notifications" />
+    }
+    <button class="menu-toggle" type="button" (click)="menuOpen.set(!menuOpen())" [attr.aria-expanded]="menuOpen()" aria-label="Ouvrir le menu">
+      <span></span><span></span>
+    </button>
+  </div>
+
+  <nav [class.open]="menuOpen()" aria-label="Navigation principale">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Accueil</a>
+    <a routerLink="/faq" routerLinkActive="active" (click)="closeMenu()">FAQ</a>
+    @if (auth.user(); as user) {
+      <a routerLink="/mes-scans" routerLinkActive="active" (click)="closeMenu()">Mes scans</a>
+      @if (user.role === 'ADMIN') {
+        <a routerLink="/utilisateurs" routerLinkActive="active" (click)="closeMenu()">Utilisateurs</a>
+      }
+      <app-notification-center class="desktop-notifications" />
+      <a class="user-link" routerLink="/profil" routerLinkActive="active" (click)="closeMenu()" aria-label="Ouvrir mon profil">
+        @if (user.profilePhotoDataUrl) {
+          <img class="user-photo" [src]="user.profilePhotoDataUrl" alt="" />
+        } @else {
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0" />
+          </svg>
+        }
+        <span>{{ user.firstName }} {{ user.lastName }}</span>
+      </a>
+      <button class="text-button" type="button" (click)="logout()">Déconnexion</button>
+    } @else {
+      <a class="nav-cta" routerLink="/connexion" (click)="closeMenu()">Connexion / inscription</a>
+    }
+  </nav>
+</header>
+
+<main><router-outlet /></main>
+
+<app-confirmation-dialog />
+
+<footer>
+  <a class="brand footer-brand" routerLink="/">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span>AgroScan</span>
+  </a>
+  <p>Une lecture plus claire de la santé de vos cultures.</p>
+  <div><a routerLink="/faq">FAQ</a><span>© 2026 AgroScan</span></div>
+</footer>

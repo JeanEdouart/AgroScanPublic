@@ -1,0 +1,43 @@
+<div class="notification-center">
+  <button class="bell-button" type="button" (click)="toggle()" [attr.aria-expanded]="open()" aria-label="Notifications">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
+    </svg>
+    @if (notifications.count()) {
+      <span class="notification-count">{{ notifications.count() }}</span>
+    }
+  </button>
+
+  @if (open()) {
+    <section class="notification-panel" aria-label="Notifications">
+      <header>
+        <strong>Notifications</strong>
+        <button type="button" (click)="clearFinished()">Effacer les terminées</button>
+      </header>
+
+      @if (notifications.notifications().length) {
+        <div class="notification-list">
+          @for (notification of notifications.notifications(); track notification.id) {
+            <article
+              [class.success]="notification.tone === 'success'"
+              [class.error]="notification.tone === 'error'"
+              [class.clickable]="notification.scanId !== null"
+              (click)="openScan(notification.scanId)"
+            >
+              <button type="button" aria-label="Supprimer" (click)="dismiss(notification.id, $event)">×</button>
+              <div>
+                <strong>{{ notification.label }}</strong>
+                <span>{{ notification.message }}</span>
+              </div>
+              <div class="progress-track" aria-hidden="true">
+                <span [style.width.%]="notification.progress"></span>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <p>Aucune notification</p>
+      }
+    </section>
+  }
+</div>

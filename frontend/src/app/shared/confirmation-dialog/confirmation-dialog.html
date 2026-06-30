@@ -1,0 +1,15 @@
+@if (confirmation.request(); as request) {
+  <dialog #dialog class="confirm-dialog" aria-labelledby="confirm-title" (click)="closeFromBackdrop($event)" (cancel)="confirmation.answer(false)">
+    <div class="dialog-mark" [class.danger]="request.tone === 'danger'" aria-hidden="true">!</div>
+    <div>
+      <h2 id="confirm-title">{{ request.title }}</h2>
+      <p>{{ request.message }}</p>
+    </div>
+    <div class="confirm-actions">
+      <button class="cancel-button" type="button" (click)="confirmation.answer(false)">{{ request.cancelLabel }}</button>
+      <button class="confirm-button" [class.danger]="request.tone === 'danger'" type="button" (click)="confirmation.answer(true)">
+        {{ request.confirmLabel }}
+      </button>
+    </div>
+  </dialog>
+}

@@ -1,0 +1,44 @@
+:root {
+  --sand: #e8dcc7;
+  --oat: #d4b895;
+  --sage: #8b9d83;
+  --clay: #b08b6e;
+  --terracotta: #c66b3d;
+  --ochre: #c08e3a;
+  --moss: #606c38;
+  --moss-dark: #354224;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: Epilogue, "Trebuchet MS", sans-serif;
+  color: var(--moss-dark);
+  background: var(--sand);
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--ochre);
+  outline-offset: 3px;
+}

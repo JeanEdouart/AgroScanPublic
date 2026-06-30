@@ -1,0 +1,318 @@
+<section class="scans-page">
+  <header class="page-heading">
+    <div>
+      <p>Votre photothèque</p>
+      <h1>Mes scans</h1>
+      <span>Importez et retrouvez les observations liées à vos cultures.</span>
+    </div>
+    <button class="upload-button" type="button" (click)="openUpload()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5M5 14v5h14v-5" /></svg>
+      Importer une image
+    </button>
+    <button class="quiet-button" type="button" (click)="openPlots()">Parcelles</button>
+  </header>
+
+  @if (insights(); as insight) {
+    <app-scan-insights [insights]="insight" (plotSelected)="filterByPlot($event)" (diseaseSelected)="filterByDisease($event)" />
+  }
+
+  <form class="search-bar" [formGroup]="searchForm" (ngSubmit)="search()">
+    <label>
+      <span>Rechercher par nom</span>
+      <input type="search" formControlName="name" placeholder="Ex. feuille de tomate" />
+    </label>
+    <label>
+      <span>Parcelle ou lot</span>
+      <input type="search" formControlName="plotName" placeholder="Ex. serre 2" />
+    </label>
+    <label>
+      <span>Favoris</span>
+      <select formControlName="favorite">
+        <option value="">Tous</option>
+        <option value="true">Favoris uniquement</option>
+        <option value="false">Non favoris</option>
+      </select>
+    </label>
+    <label>
+      <span>Archives</span>
+      <select formControlName="archiveState">
+        <option value="active">Actifs</option>
+        <option value="archived">Archives</option>
+        <option value="all">Tous</option>
+      </select>
+    </label>
+    <label>
+      <span>Plante détectée</span>
+      <input type="search" formControlName="plant" placeholder="Ex. tomate" />
+    </label>
+    <label>
+      <span>Maladie détectée</span>
+      <input type="search" formControlName="disease" placeholder="Ex. mildiou" />
+    </label>
+    <label>
+      <span>Statut</span>
+      <select formControlName="status">
+        <option value="">Tous les statuts</option>
+        <option value="UPLOADED">Importé</option>
+        <option value="ANALYSIS_PENDING">En attente</option>
+        <option value="ANALYSIS_RUNNING">Analyse en cours</option>
+        <option value="ANALYSIS_DONE">Analysé</option>
+        <option value="ANALYSIS_FAILED">Échec analyse</option>
+      </select>
+    </label>
+    <label>
+      <span>État</span>
+      <select formControlName="healthy">
+        <option value="">Tous les états</option>
+        <option value="true">Plante saine</option>
+        <option value="false">Maladie détectée</option>
+      </select>
+    </label>
+    <label>
+      <span>Date d'import</span>
+      <input type="text" formControlName="uploadedAt" placeholder="JJ/MM/AAAA hh:mm" inputmode="numeric" />
+    </label>
+    <button type="submit">Rechercher</button>
+    <button class="quiet-button" type="button" (click)="clearSearch()">Effacer</button>
+    <button class="sort-button" type="button" (click)="toggleSort()">
+      {{ ascending() ? 'Plus ancien' : 'Plus récent' }}
+    </button>
+  </form>
+
+  @if (error()) {
+    <p class="page-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <div class="empty-state" aria-live="polite"><span class="loader"></span><p>Chargement de vos scans…</p></div>
+  } @else if (results(); as pageResults) {
+    @if (pageResults.content.length) {
+      <div class="scan-list">
+        @for (scan of pageResults.content; track scan.id) {
+          <article>
+            <img [src]="scan.thumbnailDataUrl" [alt]="'Aperçu de ' + scan.name" />
+            <div class="scan-content">
+              <div class="scan-title">
+                <div><h2>{{ scan.name }}</h2><time [attr.datetime]="scan.uploadedAt">{{ scan.uploadedAt | date:'dd/MM/yyyy HH:mm' }}</time></div>
+                <div class="scan-badges">
+                  <span class="meta-pill size">{{ formatBytes(scan.imageSizeBytes) }}</span>
+                  @if (scan.favorite) { <span class="meta-pill favorite">Favori</span> }
+                  @if (scan.archived) { <span class="meta-pill archived">Archive</span> }
+                  @if (scan.plotName) { <span class="meta-pill plot">{{ scan.plotName }}</span> }
+                  @if (scan.followUpName) { <span class="meta-pill follow-up">{{ scan.followUpName }}</span> }
+                  <span class="status-badge" [class.done]="scan.analysisStatus === 'ANALYSIS_DONE'" [class.failed]="scan.analysisStatus === 'ANALYSIS_FAILED'" [class.running]="scan.analysisStatus === 'ANALYSIS_RUNNING' || scan.analysisStatus === 'ANALYSIS_PENDING'">
+                    {{ statusLabel(scan.analysisStatus) }}
+                  </span>
+                </div>
+              </div>
+              <p>{{ scan.description }}</p>
+              @if (scan.analysis; as analysis) {
+                <div class="analysis-result" [class.healthy]="analysis.healthy">
+                  <strong>{{ analysis.plantLabel }}</strong>
+                  <span>{{ analysis.diseaseLabel }}</span>
+                  <small>{{ healthyLabel(analysis.healthy) }}</small>
+                  <ul>
+                    @for (advice of analysis.advice; track advice) {
+                      <li>{{ advice }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+              <div class="scan-actions">
+                <button class="icon-toggle favorite-toggle" type="button" [class.active]="scan.favorite" (click)="toggleFavorite(scan, $event)" aria-label="Basculer le favori">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z" /></svg>
+                </button>
+                <button class="icon-toggle archive-toggle" type="button" [class.active]="scan.archived" (click)="toggleArchived(scan, $event)" aria-label="Basculer l'archive">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M6 7v13h12V7M9 11h6M5 4h14v3H5z" /></svg>
+                </button>
+                <button type="button" (click)="openDetail(scan.id)">Voir les détails</button>
+                @if (!scan.analysis) {
+                  <button type="button" (click)="analyzeScan(scan)" [disabled]="isAnalysisLoading(scan.id)">
+                    {{ isAnalysisLoading(scan.id) ? 'Analyse en cours...' : "Lancer l'analyse" }}
+                  </button>
+                }
+                <button class="danger-link" type="button" (click)="deleteScan(scan)" [disabled]="deleteLoading() === scan.id">
+                  {{ deleteLoading() === scan.id ? 'Suppression...' : 'Supprimer' }}
+                </button>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+
+      <nav class="pagination" aria-label="Pagination des scans">
+        <button type="button" (click)="previousPage()" [disabled]="page() === 0">Précédent</button>
+        <span>Page {{ pageResults.page + 1 }} sur {{ pageResults.totalPages }}</span>
+        <button type="button" (click)="nextPage()" [disabled]="pageResults.page + 1 >= pageResults.totalPages">Suivant</button>
+      </nav>
+    } @else {
+      <div class="empty-state">
+        <div class="empty-visual" aria-hidden="true"></div>
+        <h2>Aucun scan à afficher</h2>
+        <p>Importez une première image ou modifiez vos critères de recherche.</p>
+        <button type="button" (click)="openUpload()">Importer une image</button>
+      </div>
+    }
+  }
+</section>
+
+<dialog #uploadDialog class="upload-dialog" aria-labelledby="upload-title">
+  <button class="close-button" type="button" aria-label="Fermer" (click)="closeUpload()">×</button>
+  <div class="dialog-heading"><p>Nouveau scan</p><h2 id="upload-title">Importer une image</h2></div>
+  <form [formGroup]="uploadForm" (ngSubmit)="confirmUpload()">
+    <label class="file-zone">
+      @if (previewUrl()) {
+        <img [src]="previewUrl()" alt="Aperçu de l'image sélectionnée" />
+        <span>Choisir une autre image</span>
+      } @else {
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16l4-4 4 4 3-3 5 5M8 8h.01M4 4h16v16H4z" /></svg>
+        <strong>Sélectionner une image</strong>
+        <span>JPEG, PNG ou WebP, 5 Mo maximum</span>
+      }
+      <input #uploadFileInput type="file" accept="image/jpeg,image/png,image/webp" (change)="selectFile($event)" />
+    </label>
+    <label>Nom de l'image<input type="text" formControlName="name" maxlength="120" /></label>
+    <label>Description<textarea formControlName="description" rows="5" maxlength="2000"></textarea></label>
+    <div class="relation-summary">
+      <div><strong>Parcelle ou lot</strong><span>{{ uploadPlotLabel() || 'Aucune parcelle associee' }}</span></div>
+      <button class="quiet-button" type="button" (click)="openRelationPicker('uploadPlot')">Choisir</button>
+      @if (uploadPlotLabel()) { <button class="quiet-button" type="button" (click)="clearUploadPlot()">Retirer</button> }
+    </div>
+    <label>Notes<textarea formControlName="notes" rows="4" maxlength="4000" placeholder="Symptomes observes, contexte meteo, traitement essaye..."></textarea></label>
+    <div class="relation-summary">
+      <div><strong>Scan precedent</strong><span>{{ uploadFollowUpLabel() || 'Aucun scan precedent' }}</span></div>
+      <button class="quiet-button" type="button" (click)="openRelationPicker('uploadFollowUp')">Choisir</button>
+      @if (uploadFollowUpLabel()) { <button class="quiet-button" type="button" (click)="clearUploadFollowUp()">Retirer</button> }
+    </div>
+    @if (uploadError()) { <p class="dialog-error" role="alert">{{ uploadError() }}</p> }
+    <div class="dialog-actions">
+      <button class="quiet-button" type="button" (click)="closeUpload()">Annuler</button>
+      <button type="submit" [disabled]="uploadLoading()">{{ uploadLoading() ? 'Import en cours…' : 'Ajouter à mes scans' }}</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog #plotDialog class="plot-dialog" aria-labelledby="plot-title">
+  <button class="close-button" type="button" aria-label="Fermer" (click)="closePlots()">×</button>
+  <div class="dialog-heading"><p>Organisation</p><h2 id="plot-title">Parcelles et lots</h2></div>
+  <form class="plot-form" [formGroup]="plotForm" (ngSubmit)="savePlot()">
+    <label>Nom de la parcelle<input type="text" formControlName="name" maxlength="160" placeholder="Ex. Serre 2" /></label>
+    <label>Description<textarea formControlName="description" rows="3" maxlength="1000" placeholder="Culture, emplacement, remarques utiles"></textarea></label>
+    <button type="submit" [disabled]="plotLoading()">{{ plotLoading() ? 'Ajout...' : 'Ajouter la parcelle' }}</button>
+  </form>
+  <div class="plot-list">
+    @for (plot of plots(); track plot.id) {
+      <article>
+        <div>
+          <strong>{{ plot.name }}</strong>
+          @if (plot.description) { <span>{{ plot.description }}</span> }
+        </div>
+        <button class="danger-link" type="button" (click)="deletePlot(plot)" [disabled]="plotLoading()">Supprimer</button>
+      </article>
+    } @empty {
+      <p>Aucune parcelle enregistrée.</p>
+    }
+  </div>
+</dialog>
+
+<dialog #detailDialog class="detail-dialog" aria-labelledby="detail-title">
+  <button class="close-button" type="button" aria-label="Fermer" (click)="closeDetail()">×</button>
+  @if (detailLoading()) {
+    <div class="detail-loading"><span class="loader"></span><p>Chargement du détail…</p></div>
+  } @else if (selectedScan(); as scan) {
+    <img [src]="scan.imageDataUrl" [alt]="scan.name" />
+    <div class="detail-copy">
+      <p>Détail du scan</p>
+      <h2 id="detail-title">{{ scan.name }}</h2>
+      <time [attr.datetime]="scan.uploadedAt">Importé le {{ scan.uploadedAt | date:'dd/MM/yyyy à HH:mm' }}</time>
+      <p class="description">{{ scan.description }}</p>
+      <div class="detail-meta">
+        <span class="meta-pill size">{{ scan.imageMediaType }} · {{ formatBytes(scan.imageSizeBytes) }}</span>
+        @if (scan.favorite) { <span class="meta-pill favorite">Favori</span> }
+        @if (scan.archived) { <span class="meta-pill archived">Archive</span> }
+        @if (scan.plotName) { <span class="meta-pill plot">{{ scan.plotName }}</span> }
+        @if (scan.followUpName) { <span class="meta-pill follow-up">{{ scan.followUpName }}</span> }
+        <span class="status-badge" [class.done]="scan.analysisStatus === 'ANALYSIS_DONE'" [class.failed]="scan.analysisStatus === 'ANALYSIS_FAILED'" [class.running]="scan.analysisStatus === 'ANALYSIS_RUNNING' || scan.analysisStatus === 'ANALYSIS_PENDING'">
+          {{ statusLabel(scan.analysisStatus) }}
+        </span>
+      </div>
+      <form class="workflow-form" [formGroup]="workflowForm" (ngSubmit)="saveWorkflow()">
+        <div class="workflow-toggles">
+          <button class="icon-toggle favorite-toggle" type="button" [class.active]="workflowForm.controls.favorite.value" (click)="toggleWorkflowFavorite()" aria-label="Basculer le favori">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z" /></svg>
+            <span>Favori</span>
+          </button>
+          <button class="icon-toggle archive-toggle" type="button" [class.active]="workflowForm.controls.archived.value" (click)="toggleWorkflowArchived()" aria-label="Basculer l'archive">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M6 7v13h12V7M9 11h6M5 4h14v3H5z" /></svg>
+            <span>Archive</span>
+          </button>
+        </div>
+        <div class="relation-summary">
+          <div><strong>Parcelle ou lot</strong><span>{{ workflowPlotLabel() || 'Aucune parcelle associee' }}</span></div>
+          <button class="quiet-button" type="button" (click)="openRelationPicker('workflowPlot')">Choisir</button>
+          @if (workflowPlotLabel()) { <button class="quiet-button" type="button" (click)="clearWorkflowPlot()">Retirer</button> }
+        </div>
+        <label>Notes<textarea formControlName="notes" rows="4" maxlength="4000"></textarea></label>
+        <div class="relation-summary">
+          <div><strong>Scan precedent</strong><span>{{ workflowFollowUpLabel() || 'Aucun scan precedent' }}</span></div>
+          <button class="quiet-button" type="button" (click)="openRelationPicker('workflowFollowUp')">Choisir</button>
+          @if (workflowFollowUpLabel()) { <button class="quiet-button" type="button" (click)="clearWorkflowFollowUp()">Retirer</button> }
+        </div>
+        <button type="submit" [disabled]="workflowLoading()">{{ workflowLoading() ? 'Enregistrement...' : 'Enregistrer les informations' }}</button>
+      </form>
+      @if (scan.analysis; as analysis) {
+        <div class="analysis-result detail-analysis" [class.healthy]="analysis.healthy">
+          <strong>{{ analysis.plantLabel }}</strong>
+          <span>{{ analysis.diseaseLabel }}</span>
+          <small>{{ healthyLabel(analysis.healthy) }}</small>
+          <small>Analyse du {{ analysis.analyzedAt | date:'dd/MM/yyyy à HH:mm' }}</small>
+          <ul>
+            @for (advice of analysis.advice; track advice) {
+              <li>{{ advice }}</li>
+            }
+          </ul>
+        </div>
+      } @else {
+        <button type="button" (click)="analyzeScan(scan)" [disabled]="isAnalysisLoading(scan.id)">
+          {{ isAnalysisLoading(scan.id) ? 'Analyse en cours...' : "Lancer l'analyse" }}
+        </button>
+      }
+      <button class="danger-button" type="button" (click)="deleteScan(scan)" [disabled]="deleteLoading() === scan.id">
+        {{ deleteLoading() === scan.id ? 'Suppression...' : 'Supprimer ce scan' }}
+      </button>
+    </div>
+  }
+</dialog>
+
+<dialog #relationDialog class="relation-dialog" aria-labelledby="relation-title">
+  <button class="close-button" type="button" aria-label="Fermer" (click)="closeRelationPicker()">×</button>
+  <div class="dialog-heading"><p>Association</p><h2 id="relation-title">{{ relationTitle() }}</h2></div>
+  <form [formGroup]="relationPickerForm" (ngSubmit)="searchRelationOptions()">
+    <label>Recherche<input type="search" formControlName="search" [placeholder]="relationPlaceholder()" (input)="searchRelationOptions()" /></label>
+  </form>
+  <div class="relation-list">
+    @if (relationMode() === 'uploadPlot' || relationMode() === 'workflowPlot') {
+      @for (plot of relationPlotOptions(); track plot.id) {
+        <button type="button" [class.active]="relationSelectedId() === plot.id" (click)="selectRelation(plot.id, plot.name)">
+          <strong>{{ plot.name }}</strong>
+          @if (plot.description) { <span>{{ plot.description }}</span> }
+        </button>
+      } @empty {
+        <p>Aucune parcelle trouvee.</p>
+      }
+    } @else {
+      @for (option of relationScanOptions(); track option.id) {
+        <button type="button" [class.active]="relationSelectedId() === option.id" (click)="selectRelation(option.id, scanRelationLabel(option))">
+          <strong>{{ option.name }}</strong>
+          <span>{{ option.uploadedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </button>
+      } @empty {
+        <p>Aucun scan trouve.</p>
+      }
+    }
+  </div>
+  <div class="dialog-actions">
+    <button class="quiet-button" type="button" (click)="closeRelationPicker()">Annuler</button>
+    <button type="button" (click)="confirmRelationSelection()" [disabled]="!relationSelectedId()">Associer</button>
+  </div>
+</dialog>

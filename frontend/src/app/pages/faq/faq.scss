@@ -1,0 +1,60 @@
+section {
+  min-height: 75vh;
+  padding: 7rem 8vw;
+  background: var(--sand);
+}
+
+header {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  margin-bottom: 5rem;
+
+  p {
+    margin: 0;
+    color: var(--terracotta);
+    font-weight: 800;
+  }
+}
+
+h1 {
+  max-width: 12ch;
+  margin: 0;
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 0.95;
+  letter-spacing: -0.065em;
+}
+
+.questions {
+  max-width: 60rem;
+  margin-left: auto;
+}
+
+details {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--sage);
+
+  p {
+    max-width: 48rem;
+    margin: 1rem 0 0;
+    color: var(--moss);
+    line-height: 1.7;
+  }
+}
+
+summary {
+  cursor: pointer;
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  font-weight: 800;
+}
+
+@media (max-width: 700px) {
+  section {
+    padding: 4rem 5vw;
+  }
+
+  header {
+    grid-template-columns: 1fr;
+    margin-bottom: 3rem;
+  }
+}

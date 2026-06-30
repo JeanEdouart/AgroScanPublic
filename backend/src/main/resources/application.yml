@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: agroscan-backend
+  config:
+    import:
+      - optional:file:../.env[.properties]
+      - optional:file:.env[.properties]
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:agroscan}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS:health}
+
+server:
+  port: ${SERVER_PORT:8080}
+
+agroscan:
+  security:
+    jwt-secret: ${JWT_SECRET}
+    access-token-minutes: ${ACCESS_TOKEN_MINUTES:15}
+    refresh-token-days: ${REFRESH_TOKEN_DAYS:30}
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:4200}
+  admin:
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
+    first-name: ${ADMIN_FIRST_NAME:Admin}
+    last-name: ${ADMIN_LAST_NAME:AgroScan}
+  analysis:
+    model-api-url: ${MODEL_API_URL:http://localhost:5001}

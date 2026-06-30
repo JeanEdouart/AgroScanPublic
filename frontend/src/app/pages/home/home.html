@@ -1,0 +1,72 @@
+<section class="hero" aria-labelledby="home-title">
+  <div class="scroll-progress" aria-hidden="true"><span></span></div>
+
+  <div class="hero-copy">
+    <p class="eyebrow">Observer. Comprendre. Agir.</p>
+    <h1 id="home-title">La santé de vos cultures, plus lisible.</h1>
+    <p class="intro">
+      AgroScan aide à analyser vos cultures et à centraliser les observations utiles pour prendre
+      des décisions plus éclairées.
+    </p>
+    <div class="actions" aria-label="Actions principales">
+      <a class="primary" routerLink="/connexion">Créer mon compte</a>
+      <a class="secondary" routerLink="/faq">Découvrir AgroScan</a>
+    </div>
+  </div>
+
+  <div class="field-stage" aria-label="Aperçu du fonctionnement AgroScan">
+    <span class="orbit orbit-one" aria-hidden="true"></span>
+    <span class="orbit orbit-two" aria-hidden="true"></span>
+    <span class="growth-path" aria-hidden="true"></span>
+    <div class="field-card field-card-main">
+      <span class="leaf leaf-one"></span>
+      <span class="leaf leaf-two"></span>
+      <span class="scan-line"></span>
+      <strong>Observation structurée</strong>
+    </div>
+    <div class="field-card field-card-note">
+      <span>Du terrain à une lecture claire.</span>
+    </div>
+  </div>
+</section>
+
+<section class="flow" aria-labelledby="flow-title">
+  <div class="flow-heading">
+    <p class="eyebrow">Une méthode simple</p>
+    <h2 id="flow-title">Chaque observation garde son contexte.</h2>
+  </div>
+  <ol class="flow-track">
+    <li>
+      <span>01</span>
+      <strong>Observez</strong>
+      <p>Documentez ce que vous voyez directement sur la culture.</p>
+    </li>
+    <li>
+      <span>02</span>
+      <strong>Analysez</strong>
+      <p>Regroupez les informations nécessaires à une lecture cohérente.</p>
+    </li>
+    <li>
+      <span>03</span>
+      <strong>Suivez</strong>
+      <p>Retrouvez vos observations et suivez leur évolution dans le temps.</p>
+    </li>
+  </ol>
+</section>
+
+<section class="terrain" aria-labelledby="terrain-title">
+  <div class="terrain-copy">
+    <p class="eyebrow">Pensé pour le terrain</p>
+    <h2 id="terrain-title">Une interface claire sur ordinateur comme sur mobile.</h2>
+    <p>
+      AgroScan privilégie des parcours courts, une information compréhensible et un accès rapide à
+      votre espace personnel.
+    </p>
+    <a [routerLink]="auth.user() ? '/mes-scans' : '/connexion'">Commencer</a>
+  </div>
+  <div class="terrain-visual" aria-hidden="true">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</section>
